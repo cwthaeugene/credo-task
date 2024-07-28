@@ -1,17 +1,14 @@
 package test;
 
 import io.github.bonigarcia.wdm.WebDriverManager;
+import org.openqa.selenium.Dimension;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.firefox.FirefoxBinary;
-import org.openqa.selenium.firefox.FirefoxDriver;
-import org.openqa.selenium.firefox.FirefoxOptions;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeTest;
-import org.testng.annotations.Test;
-import page.auth;
+import java.awt.*;
 
-import java.io.File;
-import java.util.concurrent.TimeUnit;
 
 public class base
 {
@@ -20,26 +17,27 @@ public class base
     @BeforeTest
     public void beforetest()
     {
-        FirefoxBinary firefoxBinary = new FirefoxBinary(new File("/usr/bin/firefox"));
-
-        // Set Firefox options
-        FirefoxOptions options = new FirefoxOptions();
-        options.setBinary(firefoxBinary);
-
-        // Setup WebDriver
-        WebDriverManager.firefoxdriver().setup();
-        WebDriver driver = new FirefoxDriver(options);
-
-
-
+        java.awt.Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        WebDriverManager.chromedriver().setup();
         driver = new ChromeDriver();
-        driver.manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS);
+        Dimension maximizedScreenSize = new Dimension((int) screenSize.getWidth(), (int) screenSize.getHeight());
+        driver.manage().window().setSize(maximizedScreenSize);
         driver.get("https://mycredo.ge/landing/main/auth");
     }
-    @Test
-    public void test()
+    @AfterTest
+    public void tearDown() throws InterruptedException
     {
-        auth page = new auth(driver);
-        page.InputUsername();
+        if (driver != null) {
+            driver.quit();
+        }
+
     }
+    @AfterMethod
+    public void delay() throws InterruptedException
+    {
+        Thread.sleep(5000);
+        driver.navigate().refresh();
+    }
+
+
 }
